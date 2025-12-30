@@ -5,3 +5,6 @@ prefect
 xgboost
 fastapi
 uvicorn
+pytest
+numpy
+joblib
