@@ -34,7 +34,9 @@ jobs:
       - name: Install Dependencies
         run: pip install pandas numpy scikit-learn pytest
       - name: Execute Feature Engineering Tests
-        run: pytest src/tests/test_features.py
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          pytest src/tests/test_features.py
 
   data-validation:
     name: Data and Stats Validation
@@ -50,6 +52,7 @@ jobs:
         run: pip install pandas numpy scikit-learn
       - name: Check Data Files
         run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
           python -c "import os; assert os.path.exists('data/advertising.csv'), 'Raw data missing!'"
           python -c "from src.features.prepare_dataset import build_features; print('Data Logic: Verified')"
 
@@ -66,7 +69,9 @@ jobs:
       - name: Install Dependencies
         run: pip install pandas scikit-learn
       - name: Run Monitoring Quality Check
-        run: python -c "from src.monitoring.quality_check import run_quality_check; print('Quality Module: OK')"
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          python -c "from src.monitoring.quality_check import run_quality_check; print('Quality Module: OK')"
 
   pipeline-architecture:
     name: Pipeline Integrity
@@ -81,4 +86,6 @@ jobs:
       - name: Install Dependencies
         run: pip install pandas scikit-learn prefect mlflow xgboost
       - name: Verify Training Architecture
-        run: python -c "import pipelines.training_pipeline; print('Training Pipeline: Verified')"
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          python -c "import pipelines.training_pipeline; print('Training Pipeline: Verified')"
