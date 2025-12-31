@@ -1,1 +1,12 @@
-
+apiVersion: v1
+kind: Service
+metadata:
+  name: ad-click-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: ad-click-app
+  ports:
+    - protocol: TCP
+      port: 80         # Tarayıcıya yazacağımız port
+      targetPort: 8000 # Konteynerin çalıştığı port
