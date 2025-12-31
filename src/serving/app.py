@@ -5,14 +5,14 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from src.features.prepare_dataset import build_features
 
-# Dosya yollarını ayarla
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(os.path.dirname(current_dir))
 MODEL_PATH = os.path.join(BASE_DIR, "final_deployment_model.pkl")
 
 app = FastAPI(title="Ad Click Prediction API")
 
-# Gelen veri şablonu
+
 class AdClickData(BaseModel):
     Daily_Time_Spent: float
     Age: int
@@ -23,7 +23,7 @@ class AdClickData(BaseModel):
     Day_of_Week: int
     Is_Weekend: int
 
-# Modeli yükle
+
 if not os.path.exists(MODEL_PATH):
     model = None
 else:
@@ -35,7 +35,7 @@ def predict(data: AdClickData):
         return {"error": "Model not loaded"}
 
     try:
-        # 1. Ham veriyi oluştur
+
         raw_data = {
             "Daily Time Spent on Site": [data.Daily_Time_Spent],
             "Age": [data.Age],
@@ -53,10 +53,9 @@ def predict(data: AdClickData):
 
         df = pd.DataFrame(raw_data)
         
-        # 2. Özellikleri oluştur
+      
         processed_df = build_features(df)
 
-        # 3. FIX: Scaler hatasını düzeltmek için değerleri manuel geri yükle
         processed_df["Daily Time Spent on Site"] = data.Daily_Time_Spent
         processed_df["Age"] = data.Age
         processed_df["Area Income"] = data.Area_Income
@@ -66,26 +65,20 @@ def predict(data: AdClickData):
         processed_df["day_of_week"] = data.Day_of_Week
         processed_df["is_weekend"] = data.Is_Weekend
 
-        # Gereksiz kolonları temizle
         if "Clicked on Ad" in processed_df.columns:
             processed_df = processed_df.drop(columns=["Clicked on Ad"])
 
-        # --- YENİ EKLENEN KISIM (OLASILIK HESABI) ---
+
         
-        # 1. Sınıf Tahmini (0 veya 1)
         prediction = model.predict(processed_df)
         
-        # 2. Olasılık Tahmini (% kaç ihtimalle?)
-        # predict_proba bize [[0.15, 0.85]] gibi bir dizi döner.
-        # [0][1] diyerek "1 olma (Tıklama)" ihtimalini alıyoruz.
         probability = model.predict_proba(processed_df)[0][1]
 
         return {
             "prediction": int(prediction[0]),
-            "click_probability": float(probability), # Örn: 0.85
+            "click_probability": float(probability), 
             "status": "Success"
         }
-        # ---------------------------------------------
 
     except Exception as e:
         return {"error": str(e)}
