@@ -73,6 +73,12 @@ def predict(data: AdClickData):
         processed_df["day_of_week"] = data.Day_of_Week
         processed_df["is_weekend"] = data.Is_Weekend
 
+        # --- DEBUG BURAYA ---
+        print("\n" + "="*50)
+        print("DEBUG - MODELIN ONUNE GIDEN SON VERI (COLS):", processed_df.columns.tolist())
+        print("DEBUG - MODELIN ONUNE GIDEN SON VERI (VALUES):", processed_df.values)
+        print("="*50 + "\n")
+
         # Gereksiz kolonları temizle
         if "Clicked on Ad" in processed_df.columns:
             processed_df = processed_df.drop(columns=["Clicked on Ad"])
